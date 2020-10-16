@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneComponent.h"
+#include "ToonTanks/Actors/ProjectileBase.h"
 
 // Sets de fault values
 APawnBase::APawnBase()
@@ -38,10 +39,19 @@ void APawnBase::RotateTurret(FVector LookAtTarget)
 	TurretMesh->SetWorldRotation(TurretRotation);
 }
 
+void APawnBase::RotateTurret(FQuat Rotation)
+{
+	// adds rotation according to given quaternion
+	TurretMesh->SetWorldRotation(Rotation);
+}
+
 void APawnBase::Fire()
 {
-	// Get ProjectileSpawnPoint Location & Rotation -> spawn projectile and projects it forward
-	UE_LOG(LogTemp, Display, TEXT("Fire Towards"))
+	if (ProjectileClass)
+	{
+		AProjectileBase* tankShell = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClass, ProjectileSpawnPoint->GetComponentLocation(), TurretMesh->GetComponentRotation());
+		tankShell->SetOwner(this);
+	}
 }
 
 void APawnBase::HandleDestruction()

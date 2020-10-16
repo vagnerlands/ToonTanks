@@ -25,17 +25,26 @@ private:
 
 	FVector MoveDirection;
 	FQuat RotationDirection;
+	FQuat TurretRotation;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float MoveSpeed = 100.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float RotateSpeed = 100.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float TurretRotateSpeed = 100.f;
+
 
 	void CalculateMoveInput(float Value);
 	void CalculateRotateInput(float Value);
+	void CalculateTurretRotationOnX(float Value);
+	void CalculateTurretRotationOnY(float Value);
 
 	void Move();
 	void Rotate();
+
+	double angleOnX = 0.;
+	double angleOnY = 0.;
 
 
 	APlayerController* SelfReference = nullptr;

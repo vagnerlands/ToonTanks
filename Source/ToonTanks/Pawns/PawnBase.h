@@ -6,6 +6,7 @@
 #include "GameFramework/Pawn.h"
 #include "PawnBase.generated.h"
 
+class AProjectileBase;
 class UCapsuleComponent;
 
 UCLASS()
@@ -27,8 +28,12 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USceneComponent* ProjectileSpawnPoint;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Projectile", meta=(AllowPrivateAccess="true"))
+	TSubclassOf<AProjectileBase> ProjectileClass;
+
 protected:
 	void RotateTurret(FVector LookAtTarget);
+	void RotateTurret(FQuat Rotation);
 	void Fire();
 	virtual void HandleDestruction();
 

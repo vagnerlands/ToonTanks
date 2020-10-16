@@ -23,6 +23,16 @@ void APawnTank::CalculateRotateInput(float Value)
 	RotationDirection = FQuat(rotation);
 }
 
+void APawnTank::CalculateTurretRotationOnX(float Value)
+{
+	angleOnX = Value;
+}
+
+void APawnTank::CalculateTurretRotationOnY(float Value)
+{
+	angleOnY = Value * -1;
+}
+
 void APawnTank::Move()
 {
 	AddActorLocalOffset(MoveDirection, true);
@@ -62,15 +72,32 @@ void APawnTank::Tick(float DeltaTime)
 	Rotate();
 	Move();
 
-	if (SelfReference)
+	if ((!FMath::IsNearlyEqual(0.0, angleOnX, 0.75)) 
+		|| (!FMath::IsNearlyEqual(0.0, angleOnY, 0.75)))
 	{
-		FHitResult TraceHitResult;
-		SelfReference->GetHitResultUnderCursor(ECC_Visibility, false, TraceHitResult);
-		FVector HitLocation = TraceHitResult.ImpactPoint;
-
-		// look at location :)
-		RotateTurret(HitLocation);
+		const float actorFaceAngle = GetActorRotation().Yaw;
+		// creates a vector for the joystick
+		FVector joystickAngleVector(angleOnX, angleOnY, 0.);
+		// find the cosine between the joystick angle against "forward" vector
+		float angleCosine = joystickAngleVector.DotProduct(joystickAngleVector, FVector(0.,1.,0.));
+		// find the angle in degrees 
+		float angle = acos(angleCosine) * 180.f / 3.14159265f;
+		// little patch to trick the angle, for this calculation, if X is negative, we must invert the angle (other quadrant)
+		if (angleOnX < 0.0) 
+			angle *= -1.0;
+		// Updates the turret angle
+		RotateTurret(FQuat(FRotator(0.f, actorFaceAngle + angle, 0.f)));
 	}
+
+	//if (SelfReference)
+	//{
+	//	FHitResult TraceHitResult;
+	//	SelfReference->GetHitResultUnderCursor(ECC_Visibility, false, TraceHitResult);
+	//	FVector HitLocation = TraceHitResult.ImpactPoint;
+
+	//	// look at location :)
+	//	RotateTurret(HitLocation);
+	//}
 }
 
 // Called to bind functionality to input
@@ -80,6 +107,8 @@ void APawnTank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &APawnTank::CalculateMoveInput);
 	PlayerInputComponent->BindAxis("Turn", this, &APawnTank::CalculateRotateInput);
+	PlayerInputComponent->BindAxis("RotateTurretOnX", this, &APawnTank::CalculateTurretRotationOnX);
+	PlayerInputComponent->BindAxis("RotateTurretOnY", this, &APawnTank::CalculateTurretRotationOnY);
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APawnTank::Fire);
 
 }
