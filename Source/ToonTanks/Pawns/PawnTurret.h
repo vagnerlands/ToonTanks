@@ -18,6 +18,7 @@ class TOONTANKS_API APawnTurret : public APawnBase
 	GENERATED_BODY()
 
 private:
+	void HoldOnFire();
 	void CheckFireCondition();
 
 	FTimerHandle FireRateTimerHandle;
@@ -36,8 +37,6 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void HandleDestruction() override;
-
 public:
 	// Constructor
 	APawnTurret();
@@ -47,5 +46,7 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	void HandleDestruction() override;
 	
 };

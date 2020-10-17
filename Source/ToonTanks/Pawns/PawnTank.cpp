@@ -72,10 +72,12 @@ void APawnTank::Tick(float DeltaTime)
 	Rotate();
 	Move();
 
-	if ((!FMath::IsNearlyEqual(0.0, angleOnX, 0.75)) 
-		|| (!FMath::IsNearlyEqual(0.0, angleOnY, 0.75)))
+	// current vehicle heading
+	const float actorFaceAngle = GetActorRotation().Yaw;
+
+	if ((!FMath::IsNearlyEqual(0.0, angleOnX, 0.01)) 
+		|| (!FMath::IsNearlyEqual(0.0, angleOnY, 0.01)))
 	{
-		const float actorFaceAngle = GetActorRotation().Yaw;
 		// creates a vector for the joystick
 		FVector joystickAngleVector(angleOnX, angleOnY, 0.);
 		// find the cosine between the joystick angle against "forward" vector
@@ -87,6 +89,12 @@ void APawnTank::Tick(float DeltaTime)
 			angle *= -1.0;
 		// Updates the turret angle
 		RotateTurret(FQuat(FRotator(0.f, actorFaceAngle + angle, 0.f)));
+	}
+	else
+	{
+		// avoid the turret to be pointing to the last direction, just reset it and make it aims
+		// to the current vehicle direction
+		RotateTurret(FQuat(FRotator(0.f, actorFaceAngle, 0.f)));
 	}
 
 	//if (SelfReference)

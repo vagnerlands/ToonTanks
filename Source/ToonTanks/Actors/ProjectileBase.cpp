@@ -4,6 +4,8 @@
 #include "ProjectileBase.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/PrimitiveComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AProjectileBase::AProjectileBase()
@@ -27,7 +29,29 @@ AProjectileBase::AProjectileBase()
 void AProjectileBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	// creates a listener to the On Hit event
+	ProjectileMesh->OnComponentHit.AddDynamic(this, &AProjectileBase::OnHit);
+	UE_LOG(LogTemp, Error, TEXT("AProjectileBase::BeginPlay()"))
+}
+
+void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	// check if the owner still exists
+	AActor* MyOwner = GetOwner();
+	//UE_LOG(LogTemp, Warning, TEXT("Projectile On Hit Called"))
+	if (MyOwner)
+	{
+		if (OtherActor && (OtherActor != this) && (OtherActor != MyOwner))
+		{
+			//UE_LOG(LogTemp, Error, TEXT("Projectile hits %s"), *OtherActor->GetName())
+			UGameplayStatics::ApplyDamage(OtherActor, Damage, MyOwner->GetInstigatorController(), this, DamageType);
+		}
+
+		Destroy();
+	}
+
+
 }
 
 // Called every frame

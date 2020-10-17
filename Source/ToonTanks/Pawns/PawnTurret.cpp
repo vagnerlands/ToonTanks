@@ -11,9 +11,6 @@
 
 float APawnTurret::DistanceToPlayer() const
 {
-	if (!PlayerPawnReference)
-		return 0.f;
-
 	return FVector::Dist(PlayerPawnReference->GetActorLocation(), GetActorLocation());
 }
 
@@ -23,9 +20,7 @@ void APawnTurret::BeginPlay()
 	Super::BeginPlay();
 	// create a fire rate timer handle, every 2 seconds, the method CheckFireCondition will be called
 	// last true means that this will loop
-	GetWorld()->GetTimerManager().SetTimer(FireRateTimerHandle, this, &APawnTurret::CheckFireCondition, FireRate, true);
-
-	PlayerPawnReference = Cast<APawnTank>(UGameplayStatics::GetPlayerPawn(this, 0));
+	GetWorld()->GetTimerManager().SetTimer(FireRateTimerHandle, this, &APawnTurret::HoldOnFire, 3.f, false);
 }
 
 void APawnTurret::HandleDestruction()
@@ -42,13 +37,15 @@ void APawnTurret::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// must always check if player is still in the game, when it dies, the reference will point to an unused area of memory
+	// which is != from nullptr, so the check below is useless
+	PlayerPawnReference = Cast<APawnTank>(UGameplayStatics::GetPlayerPawn(this, 0));
+
 	if (!PlayerPawnReference 
 		|| (DistanceToPlayer() > FireRange))
 	{
 		return;
 	}
-
-	//FVector TargetRotation = GetActorRotation().Vector() - ;
 
 	//UE_LOG(LogTemp, Warning, TEXT("Turret %s rotates %s"), *GetName(), *TargetRotation.ToString())
 	RotateTurret(PlayerPawnReference->GetActorLocation());
@@ -58,14 +55,20 @@ void APawnTurret::Tick(float DeltaTime)
 void APawnTurret::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
 
-	//PlayerInputComponent->BindAxis("MoveForward", this, &APawnTank::CalculateMoveInput);
-	//PlayerInputComponent->BindAxis("Turn", this, &APawnTank::CalculateRotateInput);
-
+void APawnTurret::HoldOnFire()
+{
+	// starts counting fire
+	GetWorld()->GetTimerManager().SetTimer(FireRateTimerHandle, this, &APawnTurret::CheckFireCondition, FireRate, true);
 }
 
 void APawnTurret::CheckFireCondition()
 {
+	// must always check if player is still in the game, when it dies, the reference will point to an unused area of memory
+	// which is != from nullptr, so the check below is useless
+	PlayerPawnReference = Cast<APawnTank>(UGameplayStatics::GetPlayerPawn(this, 0));
+
 	// check if Player != nullptr (if null, player is dead/out of the game)
 	if (!PlayerPawnReference)
 	{

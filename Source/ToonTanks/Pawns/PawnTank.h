@@ -53,8 +53,6 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void HandleDestruction() override;
-
 public:
 	// Constructor
 	APawnTank();
@@ -64,5 +62,7 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	
+
+	void HandleDestruction() override;
+
 };

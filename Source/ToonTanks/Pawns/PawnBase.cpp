@@ -61,4 +61,8 @@ void APawnBase::HandleDestruction()
 	// call to child overrides
 	// 1 - PawnTurret - Inform gamemode turret died
 	// 2 - PawnTank - Inform gamemode player died (hide all components and disable player input)
+
+
+
+	Destroy();
 }
