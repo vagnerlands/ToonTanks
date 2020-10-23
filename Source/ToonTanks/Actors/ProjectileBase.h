@@ -14,20 +14,44 @@ class TOONTANKS_API AProjectileBase : public AActor
 	GENERATED_BODY()
 
 private:
+	// COMPONENTS
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta=(AllowPrivateAccess="true"))
 	UProjectileMovementComponent* ProjectileMovement;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* ProjectileMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UParticleSystemComponent* ProjectileTrail;
+	
+	// VARIABLES
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	TSubclassOf<UDamageType> DamageType;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float MovementSpeed = 1300.f;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage", meta = (AllowPrivateAccess = "true"))
 	float Damage = 5.f;
+
+	UPROPERTY(EditAnywhere, Category="Effects")
+	UParticleSystem* HitEffect;
+
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	USoundBase* ShootSound;
+
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	USoundBase* HitSound;
+
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	UForceFeedbackEffect* ForceFeedbackOnHit;
 
 	// Listeners
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	// get the player reference
+	class AActor* PlayerPawnReference;
 	
 public:	
 	// Sets default values for this actor's properties

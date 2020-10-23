@@ -54,6 +54,11 @@ void APawnTank::BeginPlay()
 void APawnTank::HandleDestruction()
 {
 	Super::HandleDestruction();
+
+	SetActorTickEnabled(false);
+	SetActorHiddenInGame(true);
+
+	isPlayerAlive = false;
 }
 
 APawnTank::APawnTank()

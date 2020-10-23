@@ -22,6 +22,7 @@ private:
 	void HandleGameStart();
 	void HandleGameOver(bool playerWon);
 	int32 GetNumberOfTurrets();
+	void RestartGame();
 
 protected:
 	UPROPERTY (EditDefaultsOnly, BlueprintReadOnly, Category="Setup")

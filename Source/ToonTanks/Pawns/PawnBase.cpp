@@ -2,10 +2,12 @@
 
 
 #include "PawnBase.h"
+#include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneComponent.h"
 #include "ToonTanks/Actors/ProjectileBase.h"
+#include "ToonTanks/Components/HealthComponent.h"
 
 // Sets de fault values
 APawnBase::APawnBase()
@@ -25,6 +27,8 @@ APawnBase::APawnBase()
 
 	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Tank Projectile Spawn Point"));
 	ProjectileSpawnPoint->SetupAttachment(TurretMesh);
+
+	HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
 
 }
 
@@ -62,6 +66,12 @@ void APawnBase::HandleDestruction()
 	// 1 - PawnTurret - Inform gamemode turret died
 	// 2 - PawnTank - Inform gamemode player died (hide all components and disable player input)
 
+	if (DeathSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation());
+	}
+
+	UGameplayStatics::SpawnEmitterAtLocation(this, DeathEffect, GetActorLocation());
 
 
 	Destroy();

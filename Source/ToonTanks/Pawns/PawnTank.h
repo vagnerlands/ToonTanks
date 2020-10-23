@@ -48,6 +48,7 @@ private:
 
 
 	APlayerController* SelfReference = nullptr;
+	bool isPlayerAlive = true;
 
 protected:
 	// Called when the game starts or when spawned
@@ -65,4 +66,14 @@ public:
 
 	void HandleDestruction() override;
 
+	bool IsPlayerAlive() const;
+
 };
+
+
+FORCEINLINE bool APawnTank::IsPlayerAlive() const
+{
+	return isPlayerAlive;
+}
+
+

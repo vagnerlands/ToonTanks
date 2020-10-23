@@ -51,6 +51,9 @@ void ATankGameModeBase::HandleGameOver(bool playerWon)
 	// check if the player has destroyed all the turrets, if so, move to "Win" condition
 	// if turret destroyed to the player, go to lose condition
 	GameOver(playerWon);
+
+	FTimerHandle GameRestartHandle;
+	GetWorld()->GetTimerManager().SetTimer(GameRestartHandle, this, &ATankGameModeBase::RestartGame, 2.f, false);
 }
 
 void ATankGameModeBase::ActorDied(AActor* DeadActor)
@@ -88,4 +91,10 @@ int32 ATankGameModeBase::GetNumberOfTurrets()
 	TArray<AActor*> Turrets;
 	UGameplayStatics::GetAllActorsOfClass(this, APawnTurret::StaticClass(), Turrets);
 	return Turrets.Num();
+}
+
+void ATankGameModeBase::RestartGame()
+{
+	// reset everything in the level
+	UGameplayStatics::OpenLevel(this, FName("Main"), true);
 }
