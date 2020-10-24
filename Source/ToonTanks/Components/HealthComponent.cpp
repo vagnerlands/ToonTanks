@@ -27,6 +27,8 @@ void UHealthComponent::BeginPlay()
 	GameModeReference = Cast<ATankGameModeBase>(UGameplayStatics::GetGameMode(this));
 	GetOwner()->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::TakeDamager);
 
+	Health = DefaultHealth;
+
 	UE_LOG(LogTemp, Warning, TEXT("Health Component has started %s"), *GetOwner()->GetName())
 	
 }
