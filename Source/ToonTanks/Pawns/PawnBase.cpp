@@ -32,6 +32,37 @@ APawnBase::APawnBase()
 
 }
 
+//float APawnBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+//{
+//
+//	float DamageToApply = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+//
+//	if (FMath::IsNearlyZero(DamageToApply) || FMath::IsNearlyZero(Health))
+//	{
+//		return;
+//	}
+//	//UE_LOG(LogTemp, Warning, TEXT("Health of %s : %f (before)"), *DamagedActor->GetName(), Health)
+//	
+//	Health = FMath::Clamp(Health - Damage, 0.f, DefaultHealth);
+//	
+//	//UE_LOG(LogTemp, Warning, TEXT("Health of %s : %f (after)"), *DamagedActor->GetName(), Health)
+//	
+//	if (FMath::IsNearlyZero(Health))
+//	{
+//		if (GameModeReference)
+//		{
+//			GameModeReference->ActorDied(GetOwner());
+//		}
+//		else
+//		{
+//			UE_LOG(LogTemp, Warning, TEXT("No Game Mode is associated to HealthComponent %s"), *this->GetName())
+//		}
+//	}
+//
+//	return DamageToApply;
+//
+//}
+
 void APawnBase::RotateTurret(FVector LookAtTarget)
 {
 	FVector LookAtTargetPlain = FVector(LookAtTarget.X, LookAtTarget.Y, TurretMesh->GetComponentLocation().Z);
@@ -73,6 +104,4 @@ void APawnBase::HandleDestruction()
 
 	UGameplayStatics::SpawnEmitterAtLocation(this, DeathEffect, GetActorLocation());
 
-
-	Destroy();
 }

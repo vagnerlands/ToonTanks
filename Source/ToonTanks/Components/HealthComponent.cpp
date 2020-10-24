@@ -3,6 +3,7 @@
 
 #include "HealthComponent.h"
 #include "ToonTanks/TankGameModeBase.h"
+#include "ToonTanks/Pawns/PawnTank.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
@@ -20,6 +21,8 @@ UHealthComponent::UHealthComponent()
 void UHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	PlayerPawnReference = Cast<APawnTank>(UGameplayStatics::GetPlayerPawn(this, 0));
 	// not safe
 	GameModeReference = Cast<ATankGameModeBase>(UGameplayStatics::GetGameMode(this));
 	GetOwner()->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::TakeDamager);
@@ -34,7 +37,12 @@ void UHealthComponent::TakeDamager(AActor* DamagedActor, float Damage, const UDa
 	{
 		return;
 	}
-	//UE_LOG(LogTemp, Warning, TEXT("Health of %s : %f (before)"), *DamagedActor->GetName(), Health)
+
+	if (!GameModeReference)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No Game Mode is associated to HealthComponent %s"), *this->GetName())
+		return;
+	}
 
 	Health = FMath::Clamp(Health - Damage, 0.f, DefaultHealth);
 
@@ -42,15 +50,14 @@ void UHealthComponent::TakeDamager(AActor* DamagedActor, float Damage, const UDa
 
 	if (FMath::IsNearlyZero(Health))
 	{
-		if (GameModeReference)
-		{
-			GameModeReference->ActorDied(GetOwner());
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("No Game Mode is associated to HealthComponent %s"), *this->GetName())
-		}
+		GameModeReference->ActorDied(GetOwner());
 	}
+
+	if (Cast<AActor>(PlayerPawnReference) == DamagedActor)
+	{
+		PlayerPawnReference->UpdateHealthBar(Health, DefaultHealth);
+	}
+
 
 }
 

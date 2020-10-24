@@ -43,15 +43,18 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	USoundBase* HitSound;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UCameraShake> HitShake;
+
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	UForceFeedbackEffect* ForceFeedbackOnHit;
+
+	// get the player reference
+	class AActor* PlayerPawnReference;
 
 	// Listeners
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-
-	// get the player reference
-	class AActor* PlayerPawnReference;
 	
 public:	
 	// Sets default values for this actor's properties

@@ -73,7 +73,7 @@ void ATankGameModeBase::ActorDied(AActor* DeadActor)
 	else if (APawnTurret* TurretReference = Cast<APawnTurret>(DeadActor))
 	{
 		TurretReference->HandleDestruction();
-		numberOfTurrets -= 1;
+		--numberOfTurrets;
 		if (numberOfTurrets == 0)
 		{
 			HandleGameOver(true);
@@ -98,3 +98,4 @@ void ATankGameModeBase::RestartGame()
 	// reset everything in the level
 	UGameplayStatics::OpenLevel(this, FName("Main"), true);
 }
+

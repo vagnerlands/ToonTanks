@@ -31,7 +31,6 @@ protected:
 public:
 	void ActorDied(AActor* DeadActor);
 
-
 protected:
 	virtual void BeginPlay() override;
 	UFUNCTION(BlueprintImplementableEvent) void GameStart();

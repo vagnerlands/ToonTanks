@@ -68,6 +68,9 @@ public:
 
 	bool IsPlayerAlive() const;
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void UpdateHealthBar(float CurrentHealth, float MaxHealth);
+
 };
 
 

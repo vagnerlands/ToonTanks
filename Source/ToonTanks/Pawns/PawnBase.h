@@ -41,6 +41,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	USoundBase* DeathSound;
 
+	//virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+
 protected:
 	void RotateTurret(FVector LookAtTarget);
 	void RotateTurret(FQuat Rotation);
