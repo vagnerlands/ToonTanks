@@ -41,7 +41,18 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	USoundBase* DeathSound;
 
-	//virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+	// how long, in seconds, takes to reload 
+	UPROPERTY(EditAnywhere, Category = "Projectile")
+	float ReloadTime = 1.f;
+
+	// used for reloading
+	FTimerHandle ReloadFireTimerHandle;
+
+	// are we ready to fire?
+	bool IsLoaded = true;
+
+	// mark this tank as ready to fire
+	void ReloadFire() { IsLoaded = true; }
 
 
 protected:

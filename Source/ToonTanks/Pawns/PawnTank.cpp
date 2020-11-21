@@ -94,6 +94,8 @@ void APawnTank::Tick(float DeltaTime)
 			angle *= -1.0;
 		// Updates the turret angle
 		RotateTurret(FQuat(FRotator(0.f, actorFaceAngle + angle, 0.f)));
+		// keep firing 
+		APawnTank::Fire();
 	}
 	else
 	{
@@ -101,16 +103,6 @@ void APawnTank::Tick(float DeltaTime)
 		// to the current vehicle direction
 		RotateTurret(FQuat(FRotator(0.f, actorFaceAngle, 0.f)));
 	}
-
-	//if (SelfReference)
-	//{
-	//	FHitResult TraceHitResult;
-	//	SelfReference->GetHitResultUnderCursor(ECC_Visibility, false, TraceHitResult);
-	//	FVector HitLocation = TraceHitResult.ImpactPoint;
-
-	//	// look at location :)
-	//	RotateTurret(HitLocation);
-	//}
 }
 
 // Called to bind functionality to input
