@@ -49,6 +49,12 @@ void APawnTank::BeginPlay()
 	Super::BeginPlay();
 
 	SelfReference = Cast<APlayerController>(GetController());
+	// declare all the possible aim inputs strategies
+	ConcreteAimStrategy[eAimStrategy_Joystick] = new JoystickAimInput;
+	ConcreteAimStrategy[eAimStrategy_Mouse] = new MouseAimInput;
+
+	// select a default behavior
+	PlayerAimStrategy = ConcreteAimStrategy[eAimStrategy_Mouse];
 }
 
 void APawnTank::HandleDestruction()
@@ -59,6 +65,15 @@ void APawnTank::HandleDestruction()
 	SetActorHiddenInGame(true);
 
 	isPlayerAlive = false;
+	// as a good practice, release all allocated resources
+	for (int i = 0; i < eAimStrategy_Total; ++i)
+	{
+		if (ConcreteAimStrategy[i] != nullptr)
+		{
+			delete ConcreteAimStrategy[i];
+			ConcreteAimStrategy[i] = nullptr;
+		}
+	}
 }
 
 APawnTank::APawnTank()
@@ -77,32 +92,7 @@ void APawnTank::Tick(float DeltaTime)
 	Rotate();
 	Move();
 
-	// current vehicle heading
-	const float actorFaceAngle = GetActorRotation().Yaw;
-
-	if ((!FMath::IsNearlyEqual(0.0, angleOnX, 0.01)) 
-		|| (!FMath::IsNearlyEqual(0.0, angleOnY, 0.01)))
-	{
-		// creates a vector for the joystick
-		FVector joystickAngleVector(angleOnX, angleOnY, 0.);
-		// find the cosine between the joystick angle against "forward" vector
-		float angleCosine = joystickAngleVector.DotProduct(joystickAngleVector, FVector(0.,1.,0.));
-		// find the angle in degrees 
-		float angle = acos(angleCosine) * 180.f / 3.14159265f;
-		// little patch to trick the angle, for this calculation, if X is negative, we must invert the angle (other quadrant)
-		if (angleOnX < 0.0) 
-			angle *= -1.0;
-		// Updates the turret angle
-		RotateTurret(FQuat(FRotator(0.f, actorFaceAngle + angle, 0.f)));
-		// keep firing 
-		APawnTank::Fire();
-	}
-	else
-	{
-		// avoid the turret to be pointing to the last direction, just reset it and make it aims
-		// to the current vehicle direction
-		RotateTurret(FQuat(FRotator(0.f, actorFaceAngle, 0.f)));
-	}
+	PlayerAimStrategy->Execute(this);
 }
 
 // Called to bind functionality to input
@@ -118,3 +108,45 @@ void APawnTank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
+
+void APawnTank::JoystickAimInput::Execute(APawnTank* pPlayer)
+{
+	// current vehicle heading
+	const float actorFaceAngle = pPlayer->GetActorRotation().Yaw;
+
+	if ((!FMath::IsNearlyEqual(0.0, pPlayer->angleOnX, 0.01))
+		|| (!FMath::IsNearlyEqual(0.0, pPlayer->angleOnY, 0.01)))
+	{
+		// creates a vector for the joystick
+		FVector joystickAngleVector(pPlayer->angleOnX, pPlayer->angleOnY, 0.);
+		// find the cosine between the joystick angle against "forward" vector
+		float angleCosine = joystickAngleVector.DotProduct(joystickAngleVector, FVector(0., 1., 0.));
+		// find the angle in degrees 
+		float angle = acos(angleCosine) * 180.f / 3.14159265f;
+		// little patch to trick the angle, for this calculation, if X is negative, we must invert the angle (other quadrant)
+		if (pPlayer->angleOnX < 0.0)
+			angle *= -1.0;
+		// Updates the turret angle
+		pPlayer->RotateTurret(FQuat(FRotator(0.f, actorFaceAngle + angle, 0.f)));
+		// keep firing 
+		pPlayer->Fire();
+	}
+	else
+	{
+		// avoid the turret to be pointing to the last direction, just reset it and make it aims
+		// to the current vehicle direction
+		pPlayer->RotateTurret(FQuat(FRotator(0.f, actorFaceAngle, 0.f)));
+	}
+}
+
+void APawnTank::MouseAimInput::Execute(APawnTank* pPlayer)
+{
+	if (pPlayer->SelfReference)
+	{
+		FHitResult TraceHitResult;
+		pPlayer->SelfReference->GetHitResultUnderCursor(ECC_Visibility, false, TraceHitResult);
+		FVector HitLocation = TraceHitResult.ImpactPoint;
+
+		pPlayer->RotateTurret(HitLocation);
+	}
+}

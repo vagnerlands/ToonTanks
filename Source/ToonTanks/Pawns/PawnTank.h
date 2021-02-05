@@ -18,6 +18,44 @@ class TOONTANKS_API APawnTank : public APawnBase
 	GENERATED_BODY()
 
 private:
+
+	enum eAimStrategy
+	{
+		eAimStrategy_First = 0,
+		eAimStrategy_Mouse = eAimStrategy_First,
+		eAimStrategy_Joystick,
+		eAimStrategy_Total
+	};
+
+	class IPlayerAimInputStrategy
+	{
+		public:
+			virtual ~IPlayerAimInputStrategy() {}
+			virtual void Execute(APawnTank* pPlayer) = 0;
+	};
+
+	class JoystickAimInput : public IPlayerAimInputStrategy
+	{
+		friend IPlayerAimInputStrategy;
+		public:
+			void Execute(APawnTank* pPlayer) override;
+	};
+
+	class MouseAimInput : public IPlayerAimInputStrategy
+	{
+		friend IPlayerAimInputStrategy;
+		public:
+			void Execute(APawnTank* pPlayer) override;
+	};
+
+	// This strategy is selected based on the input of the player
+	// if he uses the mouse to aim, it automatically changes to the mouse implementation
+	// if he uses the joystick, then it uses the joystick implementation
+	// default implementation is mouse
+	IPlayerAimInputStrategy* PlayerAimStrategy;
+	// all instances of the aim strategy
+	IPlayerAimInputStrategy* ConcreteAimStrategy[eAimStrategy_Total];
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* SpringArm;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
